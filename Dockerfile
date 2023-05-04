@@ -1,42 +1,45 @@
-# Этап 1: сборка образа с PostgreSQL
-FROM postgres:latest
-MAINTAINER Dmitry TF <Robbin-the-Bobbin@yandex.ru>
-
-# устанавливаем рабочую директорию
-WORKDIR /usr/src/app
-
-# копируем исходный код и сценарии инициализации в контейнер
-COPY init.sql /docker-entrypoint-initdb.d/
-COPY postgresql.conf /usr/local/etc/postgresql/
-
-# настраиваем переменную окружения для Postgres
-ENV POSTGRES_USER=myuser
-ENV POSTGRES_PASSWORD=mypass
-ENV POSTGRES_DB=mydb
-
-# добавляем volume для сохранения данных вне контейнера
-VOLUME /var/lib/postgresql/data
-
-# задаем пользователя и группу, которые будут запускать контейнер
-USER postgres
-
-# Этап 2: создание образа с Nginx
+# Use an official Nginx image as the parent image
 FROM nginx:latest
 
-# копируем конфигурационный файл Nginx в контейнер
-COPY nginx.conf /etc/nginx/nginx.conf
+# Set the maintainer information
+MAINTAINER Dmitry TF <Robbin-the-Bobbin@yandex.ru>
 
-# добавляем volume для сохранения логов
-VOLUME /var/log/nginx
+# Update the package manager and install PostgreSQL client
+RUN apt-get update && apt-get install -y postgresql-client
 
-# задаем порт, который будет использоваться в контейнере
+# Create directory for client_temp
+RUN mkdir /var/cache/nginx/client_temp && \
+    chown -R nginx:nginx /var/cache/nginx
+
+RUN mkdir -p /run/nginx && chown -R nginx:nginx /run/nginx
+RUN chmod 777 /var/run
+# Set the working directory to /app
+WORKDIR /app
+
+# Set the environment variable for PostgreSQL connection
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD password
+ENV POSTGRES_HOST db
+ENV POSTGRES_PORT 5432
+ENV POSTGRES_DB mydatabase
+
+# Add the Nginx configuration file
+ADD nginx.conf /etc/nginx/nginx.conf
+
+COPY ./html /usr/share/nginx/html/
+
+# Copy the application files to the container
+COPY . /app
+
+# Create a volume for the PostgreSQL data
+VOLUME /var/lib/postgresql/data
+
+# Set the user to run the container
+USER postgres
+
+# Expose port 80 for Nginx
 EXPOSE 80
+EXPOSE $POSTGRES_PORT
 
-# задаем рабочую директорию для Nginx
-WORKDIR /usr/share/nginx/html
-
-# копируем файлы для веб-сервера в контейнер
-COPY index.html .
-
-# задаем пользователя и группу, которые будут запускать контейнер
-USER nginx
+# Set the command to start Nginx
+CMD ["nginx", "-g", "daemon off;"]
