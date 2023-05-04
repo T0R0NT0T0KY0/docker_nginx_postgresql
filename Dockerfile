@@ -39,6 +39,7 @@ USER postgres
 
 # Expose port 80 for Nginx
 EXPOSE 80
+# Expose port POSTGRES_PORT for POSTGRES
 EXPOSE $POSTGRES_PORT
 
 # Set the command to start Nginx
