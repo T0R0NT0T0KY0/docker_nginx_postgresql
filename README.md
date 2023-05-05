@@ -17,7 +17,7 @@ docker build -t name_initials_image_$(date +%Y-%m-%d) .
 ```perl
 docker run -p 80:80 -p 5432:5432 --user nginx name_initials_image_$(date +%Y-%m-%d)
 ```
-![Снимок экрана 2023-05-05 в 10.37.19 AM.png](..%2F..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2Fpd%2Fqds2_6214d1g60fgfr0g8pqm0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_1o8bPi%2F%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202023-05-05%20%D0%B2%2010.37.19%20AM.png)
+![docker_run.png](img%2Fdocker_run.png)
 
 ### http://localhost:8080/
 ![localhost8080.png](img%2Flocalhost8080.png)
